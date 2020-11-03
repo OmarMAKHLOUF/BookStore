@@ -6,6 +6,8 @@ public class Commande {
 private int id;
 private Date date_cmd;
 private int prix_total;
+private Panier panier;
+private int user;
 //getter setter
 public int getId() {
 	return id;
@@ -30,17 +32,18 @@ public Commande() {
 	super();
 	// TODO Auto-generated constructor stub
 }
-public Commande(int id, Date date_cmd, int prix_total) {
+public Commande( Date date_cmd, int prix_total,Panier panier ,int user) {
 	super();
-	this.id = id;
+	this.user=user;
+	this.panier=panier;
 	this.date_cmd = date_cmd;
 	this.prix_total = prix_total;
 }
-
-public void passer_Commande() {
-	//for(int i=0;i<sous_somme.length;i++) {
-	//	this.prix_total=prix_total +sous_somme[i];
-	//}
-		
+@Override
+public String toString() {
+	return "Commande  a été passeé le " + date_cmd + ", par l utilisateur identifier par "+ user +" avec somme de " + prix_total;
 }
+ 
+
+ 
 }

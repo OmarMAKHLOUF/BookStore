@@ -4,25 +4,28 @@ import java.util.ArrayList;
 
 public class Panier {
 	private int id;
-	private int [] prix_sous_total;
-	private int qte;
+	private int prix_sous_total;
 	private int nb_produit=0;
  	private static ArrayList <Panier> panier ;
-	
+ 	public static ArrayList <Produit> item ;
+ 	private static ArrayList <Integer> qte ;
+   
  	
- 	//constructeur 
- 	public Panier() {
+ 	
+  public Panier() {
 		super();
-		// TODO Auto-generated constructor stub
-	}
-  public Panier(int id, int[] prix_sous_total, int qte, int nb_produit) {
-		super();
-		this.id = id;
-		this.prix_sous_total = prix_sous_total;
-		this.qte = qte;
-		this.nb_produit = nb_produit;
+		this.prix_sous_total = 0;
+		item =new ArrayList <Produit>();
+		qte =new ArrayList <Integer>();
+
 	}
 
+  public void ajouter_au_panier(Produit p,int q) {
+	  this.item.add(p);
+	  this.qte.add(q);
+	  this.prix_sous_total+=p.getPrixuni()*q;
+	  
+  }
 //getter & setter
 	public int getId() {
 		return id;
@@ -30,17 +33,24 @@ public class Panier {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int[] getPrix_sous_total() {
+	public int getPrix_sous_total() {
 		return prix_sous_total;
 	}
-	public void setPrix_sous_total(int[] prix_sous_total) {
+	public void setPrix_sous_total(int prix_sous_total) {
 		this.prix_sous_total = prix_sous_total;
 	}
-	public int getQte() {
+
+	public static ArrayList<Produit> getItem() {
+		return item;
+	}
+	public static void setItem(ArrayList<Produit> item) {
+		Panier.item = item;
+	}
+	public static ArrayList<Integer> getQte() {
 		return qte;
 	}
-	public void setQte(int qte) {
-		this.qte = qte;
+	public static void setQte(ArrayList<Integer> qte) {
+		Panier.qte = qte;
 	}
 	public int getNb_produit() {
 		return nb_produit;

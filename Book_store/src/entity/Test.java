@@ -2,15 +2,17 @@ package entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Test {
 private static String choix;
 private static ArrayList <Produit> stock ;
 private static ArrayList <Personne> users ;
-private static ArrayList <Panier> panier ;
-private static ArrayList <Integer> item ;
+private static ArrayList <Commande> commandes ;
 
+private static Panier panier ;
+private static int id_user;
 //methods
 public static void afficheListProduit ( ) {Produit p = new Produit(); 
 	for (int i=0;i<stock.size();i++)
@@ -150,16 +152,15 @@ Scanner scanner = new Scanner( System.in );
 
 System.out.println("introduit votre identifiant   "); 
 int id = scanner.nextInt();
- 
-	for (int i=0;i<users.size();i++)
+ id_user=id;
+	for (int i=0;i<=users.size();i++)
 	{					
 
 		if (id==users.get(i).getId()) {
 			System.out.println("welcome "+users.get(i).getPrenom());
-			 break;
-		}	else  System.out.println("identifiant invalide");
-		  break;
-	}
+			 return;
+		}	  	}
+	System.out.println("identifiant invalide");
 }
 public static void ajouterPanier(  ) {
 	  Scanner scanner = new Scanner( System.in );
@@ -168,26 +169,61 @@ public static void ajouterPanier(  ) {
 	int id = scanner.nextInt();
 	System.out.println("donner qte desiré  "); 
 	int qte = scanner.nextInt();
-	for (int i=0;i<=stock.size();i++) {
+	for (int i=0;i<stock.size();i++) {
 		if(id==stock.get(i).getId()) {
-				if(qte<=  stock.get(i) .getQte_stock() ) {
-					int qte_stock=stock.get(i).getQte_stock();
+				if(qte<=  stock.get(i).getQte_stock() ) {
+					//int qte_stock=stock.get(i).getQte_stock();
+					panier.ajouter_au_panier(stock.get(i),qte);
 				}
+				else {
+					System.out.println("Out of stock"); 
+				}
+		
 				 
-				item.add(stock.get(i).getId(),qte);
 		 
  
 	}
 	}
 }
+public static void afficher_panier ( ) {
+	System.out.println(" prix total: "+ panier.getPrix_sous_total()+"\n -------------\n" );
+
+	for (int i=0;i<panier.getItem().size();i++)
+{  
+		System.out.print("Produit: "+panier.getItem().get(i).getDesignation());
+		System.out.print(" quantité: "+ panier.getQte().get(i).toString());
+		System.out.println("\n ");
+
+}
+}
+public static void passer_commande() {
+	afficher_panier(); 
+	Scanner scanner = new Scanner( System.in );
+	   
+	  System.out.println("confirmez vous la commande ? "+"\n"+"1:oui    0:non  ");
+	  int decision = scanner.nextInt();
+	  if (decision==1) {
+			Date date_cmd =new Date();
+			 
+			int prix = panier.getPrix_sous_total();
+		 Commande c =new Commande( date_cmd, prix,panier, id_user);
+		 System.out.println(c.toString());
+		 commandes.add(c);
+		 System.out.println("merci pour votre confiance  ");
+
+	  }else afficher_panier();
+}
 
 
 public static void main(String[] args) {
+	try {
 		//Panier panier =new Panier();
 		stock =new ArrayList <Produit>();
 		users =new ArrayList <Personne>();
-		panier =new ArrayList <Panier>();
-		item =new ArrayList <Integer>();
+		commandes =new ArrayList <Commande>();
+        Personne admin =new Personne(1997,"admin","admin","admin@gmail.com",53525313);
+		panier =new Panier();
+		int  id_user;
 
 	do {
 		  
@@ -198,6 +234,12 @@ public static void main(String[] args) {
 		  
 
 		  if ( choix.charAt(0) == '1') {do {
+			   scanner = new Scanner( System.in );
+
+			  System.out.println("Donner votre login"); 
+			  String login = scanner.next();
+	
+			  if(login.toString().equals(admin.getNom())) {
 			  System.out.println("bienvenu dans votre espace  admin  "
 			  		+ "\n 1: afficher user"
 			  		+ "\n 2: ajouter user"
@@ -210,6 +252,12 @@ public static void main(String[] args) {
 			  		+ "\n 9: afficher commande passer par user"
 			  		+ "\n 0: deconecté");
 			  choix = scanner.next();
+			  }
+			  else {
+				  System.out.println("Login incorrect");
+
+				  choix="0";
+			  }
 			  switch(choix.charAt(0)) {
 			  case '1': afficheListUsers();
 			  break;
@@ -237,7 +285,12 @@ public static void main(String[] args) {
 			  break;
 			  case '8': { supprimerProduit( ); };
 			  break;
-			  case '9': System.out.println("afficher commande passer par user");
+			  case '9': {
+				  for (int i=0;i<commandes.size();i++)
+					{  
+					  System.out.println(commandes.get(i).toString());
+					}
+			  }
 			  break;
 			  case '0': System.out.println("connectez vous ");
 			  break;
@@ -245,31 +298,29 @@ public static void main(String[] args) {
 		  }while(choix.charAt(0) !='0');
   
 		  }
-		  else if ( choix.charAt(0) =='2') {do {
-			   
-			   
-			  System.out.println("bienvenu dans votre espace  user  ");
+		  else if ( choix.charAt(0) =='2') {
+			  rechercheUser();
+			  do {
+			   System.out.println("bienvenu dans votre espace  user  ");
 			  System.out.println(  
 					  	"\n 1: afficher produits"
 				  		+ "\n 2: ajouter produit au panier"
-				  		+ "\n 3: modifier quantité de produit dans  panier"
-				  		+ "\n 4: supprimer produit dans  panier"
-				  		+ "\n 5: recherche  Produit par designation"
-				  		+ "\n 6: passer commande"
+				  		+ "\n 3: Afficher panier"
+ 				  		+ "\n 4: recherche  Produit par designation"
+				  		+ "\n 5: passer commande"
 				  		+ "\n 0: deconecté ");
 			  choix = scanner.next();
 			  switch(choix.charAt(0)) {
 			  case '1': afficheListProduit();
 			  break;
-			  case '2': System.out.println("ajouter produit au panier");
+			  case '2': ajouterPanier();
 			  break;
-			  case '3': System.out.println("modifier quantité de produit dans  panier");
+			  case '3': afficher_panier();
 			  break;
-			  case '4': System.out.println("supprimer produit dans  panier");
+			   
+			  case '4': rechercheProduit( ); 
 			  break;
-			  case '5': { rechercheProduit( ); };
-			  break;
-			  case '6': System.out.println("passer commande");
+			  case '5': passer_commande();
 			  break;
 			  case '0': System.out.println("connectez vous");
 			  break;
@@ -285,7 +336,10 @@ public static void main(String[] args) {
 	
 	
 	
-	
+	}
+	catch(Exception e ) {
+		System.out.print("erreur");
+	}
 	
 	
 	}

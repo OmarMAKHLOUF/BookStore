@@ -1,6 +1,9 @@
 package entity;
 
+import java.sql.SQLException;
 import java.util.Scanner;
+
+import com.mysql.jdbc.ResultSet;
 
 public class Personne {
 
@@ -9,7 +12,8 @@ public class Personne {
 	private String prenom;
 	private String email;
 	private int tel;
-	
+	Scanner scanner = new Scanner( System.in );
+
 	//constructeur 
 	public Personne(int id, String nom, String prenom, String email, int tel) {
 		super();
@@ -55,25 +59,60 @@ public class Personne {
 		this.tel = tel;
 	}
 	
+	 //methods
 	 
-	public String afficheUser() {
-		return "Personne [id=" + id + ", nom=" + nom + ", prenom=" + prenom + ", email=" + email + ", tel=" + tel + "]";
-	}
+ 	public static void afficheUser2() throws ClassNotFoundException, SQLException 
+	{   	MyConnection c=new MyConnection();
+	 
+	try {
+		java.sql.PreparedStatement istmt = c.c.prepareStatement("SELECT * FROM personne "); 
+	ResultSet rs = (ResultSet) istmt.executeQuery();
+	int i=0;
+	while (rs.next()) {
+	    i++;
+	    System.out.println("user n° "+i);
+	    System.out.println("id : " + rs.getString("id"));
+	    System.out.println("nom : " + rs.getString("nom"));
+	    System.out.println("prenom : " + rs.getString("prenom"));
+	    System.out.println("email : " + rs.getString("email"));
+	    System.out.println("tel: " + rs.getString("tel"));
+ 	}}
+	catch(SQLException e)
+	{e.printStackTrace();}
 
-	Scanner scanner = new Scanner( System.in );
-	public Personne creerPersonne( ) {
+
+
+	 }
+	public static void creerPersonne( ) throws ClassNotFoundException, SQLException{
+		try {
+			MyConnection c=new MyConnection();
+			Scanner scanner = new Scanner( System.in );
+
 		  System.out.println("saisir id");
-		  this.id = scanner.nextInt();
+		  int id = scanner.nextInt();
 		  System.out.println("saisir nom");
-		  this.nom = scanner.next();
+		  String nom = scanner.next();
 		  System.out.println("saisir prenom");
-		  this.prenom = scanner.next();
+		  String prenom = scanner.next();
 		  System.out.println("saisir email");
-		  this.email = scanner.next();
+		 String email = scanner.next();
 		  System.out.println("saisir tel");
-		  this.tel = scanner.nextInt();
+		  int tel = scanner.nextInt();
+		  String req="INSERT INTO personne ( id,nom,prenom,email,tel) VALUES (? , ?, ?, ?, ?)";
+		   java.sql.PreparedStatement istmt = c.c.prepareStatement(req);
+		   istmt.setInt(1,id);
+		   istmt.setString(2, nom );
+		   istmt.setString(3, prenom );
+		   istmt.setString(4,email);
+		   istmt.setInt(5,tel);
+ 		    System.out.println("Added with Success");
+		    istmt.executeUpdate();
+		  }catch(Exception e) {
+			  System.out.println("erreur insertion");
+
+		  }
 		   
-		return new Personne(this.id,this.nom,this.prenom,this.email,this.tel);
+		//return new Personne(this.id,this.nom,this.prenom,this.email,this.tel);
 	 
 	}
 

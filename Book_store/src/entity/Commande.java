@@ -1,65 +1,88 @@
 package entity;
 
+ 
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Scanner;
 
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.ResultSet;
-
 public class Commande {
-private int id;
-private String date_cmd;
-private int prix_total;
-private Panier panier;
-private int user;
-//getter setter
-public int getId() {
-	return id;
-}
-public void setId(int id) {
-	this.id = id;
-}
- 
-public int getPrix_total() {
-	return prix_total;
-}
-public void setPrix_total(int prix_total) {
-	this.prix_total = prix_total;
-}
-//constructeur 
-public Commande() {
-	super();
-	// TODO Auto-generated constructor stub
-}
-public Commande( String date_cmd, int prix_total,Panier panier ,int user) {
-	super();
-	this.user=user;
-	this.panier=panier;
-	this.date_cmd = date_cmd;
-	this.prix_total = prix_total;
-}
-
- 
-/////////////////////////////////////////////////////////////////////////////
-   /*  public void passerCommande() throws ClassNotFoundException, SQLException 
-    { MyConnection c=new MyConnection();
-    	 double pricebook = 0;
-    MyConnection con;
-    PreparedStatement pstmt;
+	public void addCommande() throws ClassNotFoundException, SQLException 
+	{ 
+	double pricebook = 0;
+	MyConnection con;
+	PreparedStatement pstmt;
     con = new MyConnection();
-    
-    pstmt =  (PreparedStatement) c.c.prepareStatement("INSERT INTO `commande`(id,date_cmd,prix_total,id_panier) VALUES ( ?, ?, ?, ?)");
+    System.out.println("Put in the book's id ");
+	Scanner sc1 = new Scanner( System.in );
+	long idBook   = sc1.nextLong();
+	System.out.println("Put in the quantity ");
+	Scanner sc2 = new Scanner( System.in );
+	int quantite   = sc2.nextInt();
+	 try {
+	        pstmt = con.MyConnec().prepareStatement("SELECT * FROM Book where id = ? "); 
+	        pstmt.setDouble(1,idBook);
+	        ResultSet rs = pstmt.executeQuery();
+	        while (rs.next()) 
+	        	{
+	        	 pricebook =Double.parseDouble(rs.getString("price"));
+	        	}
+	        }
+	        catch(SQLException e)
+	        {
+	        	e.printStackTrace();
+	        }
+    pstmt =  con.MyConnec().prepareStatement("INSERT INTO `commande`(id,idbook,price,quantite,total) VALUES ( ?, ?, ?, ?,?)");
     pstmt.setNString(1, null );
-    pstmt.setString(2, date_cmd  );
-     pstmt.setInt(4, prix_total );
-  //  pstmt.setDouble(5,pricebook*quantite );
-    System.out.println("addition with success");
-    pstmt.executeUpdate();
-    }
-*/
-//////////////////////////////////////////////////////////////////////////////
-
- 
-
+    pstmt.setLong(2, idBook );
+    pstmt.setDouble(3,pricebook);
+    pstmt.setInt(4, quantite );
+    pstmt.setDouble(5,pricebook*quantite );
+	System.out.println("addition with success");
+	pstmt.executeUpdate();
+	}
+	
+	public void displayBill() throws ClassNotFoundException, SQLException 
+	{   MyConnection con;
+	PreparedStatement pstmt;
+	double CalculTotal = 0;
+    con = new MyConnection();
+    try {
+    pstmt = con.MyConnec().prepareStatement("SELECT * FROM commande "); 
+    ResultSet rs = pstmt.executeQuery();
+    int i=0;
+    while (rs.next()) {
+    	i++;
+        System.out.println("Commande n°"+i);
+        System.out.println("id : " + rs.getString("id")+" Idbook : " 
+        + rs.getString("idbook")+" Price : " 
+        + rs.getString("price")+" Quantite : " 
+        + rs.getString("quantite")+" Total : " 
+        + rs.getString("total"));
+        CalculTotal =CalculTotal+Double.parseDouble(rs.getString("total"));         
+    		}
+    
+	System.out.println("Total à payer = "+CalculTotal);
+    	}
+    catch(SQLException e)
+    {e.printStackTrace();}
+	 }
+	
+	
+	public void deleteBill() throws ClassNotFoundException, SQLException
+	{
+		MyConnection con;
+		PreparedStatement pstmt;
+	    con = new MyConnection();
+	    try {
+            pstmt = con.MyConnec().prepareStatement("TRUNCATE TABLE commande ");
+            pstmt.executeUpdate();
+            }
+            catch(SQLException e)
+            {e.printStackTrace();}
+		
+	}
+	
+	
 }
